@@ -1,0 +1,25 @@
+{
+  "name": "talk-spades",
+  "version": "0.0.1",
+  "description": "multiplayer Spades game for browsers with communication during bidding phase",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV='test' mocha \"./*.spec.js\""
+  },
+  "keywords": [
+    "spades",
+    "cards",
+    "multiplayer"
+  ],
+  "author": "Andrew E. Sokolowski",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "*",
+    "@babel/polyfill": "*",
+    "@babel/preset-env": "*",
+    "chai": "*",
+    "eslint": "*",
+    "mocha": "*",
+    "nodemon": "*"
+  }
+}
