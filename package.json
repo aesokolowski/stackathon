@@ -2,9 +2,10 @@
   "name": "talk-spades",
   "version": "0.0.1",
   "description": "multiplayer Spades game for browsers with communication during bidding phase",
+  "repository": "https://github.com/aesokolowski/stackathon.git",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV='test' mocha \"./*.spec.js\""
+    "test": "NODE_ENV='test' mocha \"./tests/*.spec.js\""
   },
   "keywords": [
     "spades",
@@ -17,7 +18,7 @@
     "@babel/core": "*",
     "@babel/polyfill": "*",
     "@babel/preset-env": "*",
-    "chai": "*",
+    "chai": "^4.2.0",
     "eslint": "*",
     "mocha": "*",
     "nodemon": "*"
