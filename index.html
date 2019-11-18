@@ -13,6 +13,14 @@
     <div id="game-area">
       <ul id="card-list"></ul>
     </div>
+    <div id="bid-area">
+      <div id="bid-info"></div>
+      <div id="bid-wait"></div>
+      <form id="bid-form">
+        <input type="text" id="bid-data" />
+        <button type="submit">Enter bid</button>
+      </form>
+    </div>
   </div>
 </body>
 
@@ -22,6 +30,11 @@
     const $waitingArea = $('#waiting-area');
     const $gameArea = $('#game-area');
     const $cardList = $('#card-list');
+    const $bidArea = $('#bid-area');
+    const $bidWait = $('#bid-wait');
+    const $bidForm = $('#bid-form');
+    const $bidData = $('#bid-data');
+    const $bidInfo = $('#bid-info');
 
     const decodeName = name => {
       switch (name) {
@@ -90,10 +103,27 @@
 
     $waitingArea.html('Waiting for more users...');
     $gameArea.hide();
+    $bidArea.hide();
+
+    $bidForm.submit(evt => {
+      evt.preventDefault();
+      socket.emit('submit bid', $bidData.val());
+      $bidData.val('');
+    });
 
     socket.on('start game', data => {
       $waitingArea.hide();
       $gameArea.show();
+      $bidArea.show();
+      $bidInfo.hide();
+      if (data.nextPlayer === data.playerNumber) {
+        $bidForm.show();
+        $bidWait.hide();
+      } else {
+        $bidForm.hide();
+        $bidWait.show();
+        $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
+      }
 
       const html = data.hand.cards.reduce((list, card) => {
         list += '<li>' + decodeName(card.name) + ' of ' + decodeSuit(card.suit) 
@@ -102,7 +132,19 @@
       }, '');
 
       $cardList.html(html);
-
     });
+
+   socket.on('next bid', data => {
+     $bidInfo.show();
+     $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
+     if (data.nextPlayer === data.playerNumber) {
+       $bidForm.show();
+       $bidWait.hide();
+     } else {
+       $bidForm.hide();
+       $bidWait.show();
+       $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
+     }
+   });
   });
 </script>

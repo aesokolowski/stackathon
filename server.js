@@ -17,7 +17,6 @@ const { BLACK, RED } = require('./enums/colorEnums');
 const { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN,
         KING, JOKER } = require('./enums/nameEnums');
 
-const users = [];
 const connections = [];
 
 let deck;
@@ -55,11 +54,12 @@ const startGame = () => {
     nextPlayer = nextPlayer === WEST ? NORTH : nextPlayer + 1;   
   }
 
-  console.log('NORTH hand:');
-  console.dir(table[NORTH]);
-
   connections.forEach(socket => {
-    socket.emit('start game', { hand: table[socket.userNumber].hand });
+    socket.emit('start game', { 
+      hand: table[socket.userNumber].hand,
+      playerNumber: socket.userNumber,
+      nextPlayer: nextPlayer
+    });
   });
 };
 
@@ -88,4 +88,20 @@ io.sockets.on('connection', socket => {
       '%s Disconnected: %s in total', socket.userNumber, connections.length
     );
   });
+
+  socket.on('submit bid', lastBid => {
+    let lastPlayer = nextPlayer;
+
+    table[nextPlayer].bid = lastBid;
+    nextPlayer = nextPlayer === WEST ? NORTH : nextPlayer + 1;
+    connections.forEach(socket => {
+      socket.emit('next bid', {
+        playerNumber: socket.userNumber,
+        lastPlayer: lastPlayer,
+        lastBid: lastBid,
+        nextPlayer: nextPlayer
+      });
+    });
+  });
+
 });
