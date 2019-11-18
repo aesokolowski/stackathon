@@ -3,7 +3,7 @@ const { BLACK, RED } = require('./enums/colorEnums');
 const { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN,
         KING, JOKER } = require('./enums/nameEnums');
 
-class card {
+class Card {
   constructor(name, suit, rank) {
     this.name = name;
     this.suit = suit;
@@ -83,4 +83,4 @@ class card {
   }
 };
 
-module.exports = card;
+module.exports = Card;

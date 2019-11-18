@@ -1,4 +1,4 @@
-const card = require('./card');
+const Card = require('./card');
 
 // enums
 const { CLUBS, DIAMONDS, HEARTS, SPADES } = require('./enums/suitEnums');
@@ -12,7 +12,7 @@ const DEF_AH = true,
       DEF_LB = false,
       DEF_JK = false;
 
-class deck {
+class Deck {
   constructor(options = {}) {
     this.aceHigh = typeof options.aceHigh === 'undefined' ?
       DEF_AH : options.aceHigh;
@@ -22,7 +22,7 @@ class deck {
     this.joker = typeof options.jokers === 'undefined' ?
       DEF_JK : options.jokers;
     this.trumps = options.trumps || null;
-    this.draw = deck.generateDeck({
+    this.draw = Deck.generateDeck({
       aceHigh: this.aceHigh,
       wild: this.wild,
       lowball: this.lowball,
@@ -41,7 +41,7 @@ class deck {
     if (!this.jokers) {
       for (let i = KING; i >= ACE; i--) {
         for (let j = SPADES; j >= CLUBS; j--) {
-          deck.push(new card(
+          deck.push(new Card(
             i, j, i === ACE ?
               options.aceHigh ? 14 : 1
             : i
@@ -65,6 +65,7 @@ class deck {
     }
   }
 
+  // standard compare function -- a la determining tie-breaking in poker
   compare(card1, card2) {
     if (this.trumps !== null) {
       if (card1.suit === this.trumps && card2.suit !== this.trumps) {
@@ -77,6 +78,32 @@ class deck {
     }
 
     return this.lowball ? card2.rank - card1.rank : card1.rank - card2.rank;
+  }
+
+  // compare function specifically for Spades --
+  // returns neg only if a beating card is played, otherwise returns pos
+  // remember that in Spades if you can't follow suit you lose the hand unless
+  // you play a spade
+  // in order to work this.trumps needs to be initialized as SPADES and all
+  // other options must be default
+  spadesCompare(card1, card2) {
+    if (card1.suit === this.trumps && card2.suit === this.trumps) {
+      return card1.rank - card2.rank;
+    }
+
+    if (card1.suit === this.trumps) {
+      return 1;
+    }
+
+    if (card2.suit === this.trumps) {
+      return -1;
+    }
+
+    if (card1.suit === card2.suit) {
+      return card1.rank - card2.rank;
+    }
+
+    return 1;
   }
 
   dealOne() {
@@ -98,6 +125,13 @@ class deck {
 
     throw new Error('that card is not in play');
   }
+
+  toString() {
+    return this.draw.reduce((str, card) => {
+      str += '\n' + card.toString();
+      return str;
+    }, '');
+  }
 }
 
-module.exports = deck;
+module.exports = Deck;
