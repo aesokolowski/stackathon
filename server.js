@@ -20,6 +20,7 @@ const { ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN,
 const connections = [];
 
 let deck;
+let numBids = 0;
 const table = [null];
 const trick = [null];
 
@@ -92,16 +93,32 @@ io.sockets.on('connection', socket => {
   socket.on('submit bid', lastBid => {
     let lastPlayer = nextPlayer;
 
+    numBids++;
     table[nextPlayer].bid = lastBid;
     nextPlayer = nextPlayer === WEST ? NORTH : nextPlayer + 1;
-    connections.forEach(socket => {
-      socket.emit('next bid', {
-        playerNumber: socket.userNumber,
-        lastPlayer: lastPlayer,
-        lastBid: lastBid,
-        nextPlayer: nextPlayer
+    if (numBids < 4) {
+      connections.forEach(socket => {
+        socket.emit('next bid', {
+          playerNumber: socket.userNumber,
+          lastPlayer: lastPlayer,
+          lastBid: lastBid,
+          nextPlayer: nextPlayer
+        });
       });
-    });
+    } else {
+      connections.forEach(socket => {
+        socket.emit('start play', {
+          playerNumber: socket.userNumber,
+          lastPlayer: lastPlayer,
+          lastBid: lastBid,
+          nextPlayer: nextPlayer
+        });
+      });
+    }
+  });
+
+  socket.on('play card', cardPlayed => {
+    console.dir(cardPlayed);
   });
 
 });

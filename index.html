@@ -4,147 +4,221 @@
     <title>Kinda Play Spades</title>
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <style>
+      a.anchor {
+        pointer-events: none;
+      }
+    </style>
   </head>
-</html>
 
-<body>
-  <div>
-    <div id="waiting-area"></div>
-    <div id="game-area">
-      <ul id="card-list"></ul>
+  <body>
+    <div id="container">
+      <div id="waiting-area"></div>
+      <div id="game-area">
+        <ul id="card-list">
+          <li id="card0" class="card"></li>
+          <li id="card1" class="card"></li>
+          <li id="card2" class="card"></li>
+          <li id="card3" class="card"></li>
+          <li id="card4" class="card"></li>
+          <li id="card5" class="card"></li>
+          <li id="card6" class="card"></li>
+          <li id="card7" class="card"></li>
+          <li id="card8" class="card"></li>
+          <li id="card9" class="card"></li></a>
+          <li id="card10" class="card"></li></a>
+          <li id="card11" class="card"></li></a>
+          <li id="card12" class="card"></li></a>
+        </ul>
+      </div>
+      <div id="bid-area">
+        <div id="bid-info"></div>
+        <div id="bid-wait"></div>
+        <form id="bid-form">
+          <input type="text" id="bid-data" />
+          <button type="submit">Enter bid</button>
+        </form>
+      </div>
+      <div id="play-area">
+        <div id="play-msg"></div>
+      </div>
     </div>
-    <div id="bid-area">
-      <div id="bid-info"></div>
-      <div id="bid-wait"></div>
-      <form id="bid-form">
-        <input type="text" id="bid-data" />
-        <button type="submit">Enter bid</button>
-      </form>
+    <div id="trick-area">
+      <ul id="trick-list">
+        <li id="trick1"></li>
+        <li id="trick2"></li>
+        <li id="trick3"></li>
+        <li id="trick4"></li>
+      </ul>
     </div>
-  </div>
-</body>
+  </body>
 
-<script>
-  $(() => {
-    const socket = io.connect();
-    const $waitingArea = $('#waiting-area');
-    const $gameArea = $('#game-area');
-    const $cardList = $('#card-list');
-    const $bidArea = $('#bid-area');
-    const $bidWait = $('#bid-wait');
-    const $bidForm = $('#bid-form');
-    const $bidData = $('#bid-data');
-    const $bidInfo = $('#bid-info');
+  <script>
+    $(() => {
+      const socket = io.connect();
+      const $waitingArea = $('#waiting-area');
+      const $gameArea = $('#game-area');
+      const $cardList = $('#card-list');
+      const $card0 = $('#card0');
+      const $card1 = $('#card1');
+      const $card2 = $('#card2');
+      const $card3 = $('#card3');
+      const $card4 = $('#card4');
+      const $card5 = $('#card5');
+      const $card6 = $('#card6');
+      const $card7 = $('#card7');
+      const $card8 = $('#card8');
+      const $card9 = $('#card9');
+      const $card10 = $('#card10');
+      const $card11 = $('#card11');
+      const $card12 = $('#card12');
+      const $bidArea = $('#bid-area');
+      const $bidWait = $('#bid-wait');
+      const $bidForm = $('#bid-form');
+      const $bidData = $('#bid-data');
+      const $bidInfo = $('#bid-info');
+      const $playArea = $('#play-area');
+      const $playMsg = $('#play-msg');
+      const $trickArea = $('#trick-area');
+      const $trick1 = $('#trick1');
+      const $trick2 = $('#trick2');
+      const $trick3 = $('#trick3');
+      const $trick4 = $('#trick4');
+      const $anchor = $('.anchor');
+      const $card = $('.card');
+      const hand = [$card0, $card1, $card2, $card3, $card4, $card5, $card6,
+        $card7, $card8, $card9, $card10, $card11, $card12];
 
-    const decodeName = name => {
-      switch (name) {
-        case 1:
-          return 'Ace';
-          break;
-        case 2:
-          return '2';
-          break;
-        case 3:
-          return '3';
-          break;
-        case 4:
-          return '4';
-          break;
-        case 5:
-          return '5';
-          break;
-        case 6:
-          return '6';
-          break;
-        case 7:
-          return '7';
-          break;
-        case 8:
-          return '8';
-          break;
-        case 9:
-          return '9';
-          break;
-        case 10:
-          return '10';
-          break;
-        case 11:
-          return 'Jack';
-          break;
-        case 12:
-          return 'Queen';
-          break;
-        case 13:
-          return 'King';
-          break;
-        default:
-          return 'What kinda card ya playin\'?';
-      }
-    };
+      const decodeName = name => {
+        switch (name) {
+          case 1:
+            return 'Ace';
+            break;
+          case 2:
+            return '2';
+            break;
+          case 3:
+            return '3';
+            break;
+          case 4:
+            return '4';
+            break;
+          case 5:
+            return '5';
+            break;
+          case 6:
+            return '6';
+            break;
+          case 7:
+            return '7';
+            break;
+          case 8:
+            return '8';
+            break;
+          case 9:
+            return '9';
+            break;
+          case 10:
+            return '10';
+            break;
+          case 11:
+            return 'Jack';
+            break;
+          case 12:
+            return 'Queen';
+            break;
+          case 13:
+            return 'King';
+            break;
+          default:
+            return 'What kinda card ya playin\'?';
+        }
+      };
 
-    const decodeSuit = suit => {
-      switch (suit) {
-        case 1:
-          return 'Clubs';
-          break;
-        case 2:
-          return 'Diamonds';
-          break;
-        case 3:
-          return 'Hearts';
-          break;
-        case 4:
-          return 'Spades';
-          break;
-        default:
-          return 'What kinda funny card ya playin\'?';
-      }
-    };
+      const decodeSuit = suit => {
+        switch (suit) {
+          case 1:
+            return 'Clubs';
+            break;
+          case 2:
+            return 'Diamonds';
+            break;
+          case 3:
+            return 'Hearts';
+            break;
+          case 4:
+            return 'Spades';
+            break;
+          default:
+            return 'What kinda funny card ya playin\'?';
+        }
+      };
 
-    $waitingArea.html('Waiting for more users...');
-    $gameArea.hide();
-    $bidArea.hide();
+      $waitingArea.html('Waiting for more users...');
+      $gameArea.hide();
+      $bidArea.hide();
+      $playArea.hide();
+      $trickArea.hide();
 
-    $bidForm.submit(evt => {
-      evt.preventDefault();
-      socket.emit('submit bid', $bidData.val());
-      $bidData.val('');
-    });
+     $bidForm.submit(evt => {
+        evt.preventDefault();
+        socket.emit('submit bid', $bidData.val());
+        $bidData.val('');
+      });
 
-    socket.on('start game', data => {
-      $waitingArea.hide();
-      $gameArea.show();
-      $bidArea.show();
-      $bidInfo.hide();
-      if (data.nextPlayer === data.playerNumber) {
-        $bidForm.show();
-        $bidWait.hide();
-      } else {
-        $bidForm.hide();
-        $bidWait.show();
-        $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
-      }
+      $card.click(evt => {
+        evt.preventDefault();
+        console.dir(evt);
+        socket.emit('play card', evt.target.card);
+      });
 
-      const html = data.hand.cards.reduce((list, card) => {
-        list += '<li>' + decodeName(card.name) + ' of ' + decodeSuit(card.suit) 
-          + '</li>';
-        return list;
-      }, '');
+      socket.on('start game', data => {
+        $waitingArea.hide();
+        $gameArea.show();
+        $bidArea.show();
+        $bidInfo.hide();
+        if (data.nextPlayer === data.playerNumber) {
+          $bidForm.show();
+          $bidWait.hide();
+        } else {
+          $bidForm.hide();
+          $bidWait.show();
+          $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
+        }
 
-      $cardList.html(html);
-    });
+        data.hand.cards.forEach((card, idx) => {
+          hand[idx].card = card;
+          hand[idx].html(decodeName(card.name) + ' of ' +
+            decodeSuit(card.suit) + '.');
+        });
+      });
 
-   socket.on('next bid', data => {
-     $bidInfo.show();
-     $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
-     if (data.nextPlayer === data.playerNumber) {
-       $bidForm.show();
-       $bidWait.hide();
-     } else {
+     socket.on('next bid', data => {
+       $bidInfo.show();
+       $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
+       if (data.nextPlayer === data.playerNumber) {
+         $bidForm.show();
+         $bidWait.hide();
+       } else {
+         $bidForm.hide();
+         $bidWait.show();
+         $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
+       }
+     });
+
+     socket.on('start play', data => {
        $bidForm.hide();
-       $bidWait.show();
-       $bidWait.html('Waiting for player ' + data.nextPlayer + ' to bid.');
-     }
-   });
-  });
-</script>
+       $bidInfo.show();
+       $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
+       $playArea.show();
+       $playMsg.show();
+       if (data.nextPlayer === data.playerNumber) {
+         $playMsg.html('Select a card to play.');
+       } else {
+         $playMsg.html('Waiting for player ' + data.nextPlayer +
+           ' to play a card.');
+       }
+     });
+    });
+  </script>
+</html>
