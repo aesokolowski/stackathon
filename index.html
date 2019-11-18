@@ -168,7 +168,6 @@
 
       $card.click(evt => {
         evt.preventDefault();
-        evt.target.hide();
         socket.emit('play card', evt.target.id);
       });
 
