@@ -168,8 +168,8 @@
 
       $card.click(evt => {
         evt.preventDefault();
-        console.dir(evt);
-        socket.emit('play card', evt.target.card);
+        evt.target.hide();
+        socket.emit('play card', evt.target.id);
       });
 
       socket.on('start game', data => {
@@ -195,7 +195,7 @@
 
      socket.on('next bid', data => {
        $bidInfo.show();
-       $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
+       $bidInfo.html('Player' + data.lastPlayer + ' bid ' + data.lastBid + '.');
        if (data.nextPlayer === data.playerNumber) {
          $bidForm.show();
          $bidWait.hide();
@@ -209,7 +209,10 @@
      socket.on('start play', data => {
        $bidForm.hide();
        $bidInfo.show();
-       $bidInfo.html(data.lastPlayer + ' bid ' + data.lastBid + '.');
+       $bidWait.hide();
+       $bidInfo.html(
+         'Player ' + data.lastPlayer + ' bid ' + data.lastBid + '.'
+       );
        $playArea.show();
        $playMsg.show();
        if (data.nextPlayer === data.playerNumber) {
@@ -218,6 +221,11 @@
          $playMsg.html('Waiting for player ' + data.nextPlayer +
            ' to play a card.');
        }
+     });
+
+     socket.on('next play', data => {
+       $playMsg.html('Player ' + data.lastPlayer + ' played the ' +
+         decodeName(data.card.name) + ' of ' + decodeSuit(data.card.suit));
      });
     });
   </script>

@@ -118,7 +118,16 @@ io.sockets.on('connection', socket => {
   });
 
   socket.on('play card', cardPlayed => {
-    console.dir(cardPlayed);
+    console.log(cardPlayed);
+    let cardIdx = cardPlayed.slice(4).toString();
+    const card = table[nextPlayer].hand.cards[cardIdx];
+
+    connections.forEach(socket => {
+      io.sockets.emit('next play', {
+        card: card,
+        lastPlayer: nextPlayer
+      });
+    });
   });
 
 });
