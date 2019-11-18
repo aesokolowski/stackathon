@@ -14,6 +14,10 @@
   ],
   "author": "Andrew E. Sokolowski",
   "license": "ISC",
+  "dependencies": {
+    "socket.io": "*",
+    "express": "*"
+  },
   "devDependencies": {
     "@babel/core": "*",
     "@babel/polyfill": "*",
